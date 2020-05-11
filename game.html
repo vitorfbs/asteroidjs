@@ -69,7 +69,6 @@
     var asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position];
     var x_asteroid = 800;
     var y_asteroid = 150;
-    console.log(asteroid_current_direction);
     // Initialize the asteroid's default dimensions
     var height_asteroid = 100;
     var width_asteroid = 100;
@@ -141,7 +140,7 @@
             spawnAsteroid(x_asteroid, y_asteroid);
         }
         else{
-            // Creates an asteroid in a semi-random place with a semi-random art
+            // Creates an asteroid in a semi-random place with a semi-random art with a semi-random direction
             asteroid_current_spawn_position = getRandomInt(4);
             asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position][1];
             sprite_asteroid.src = sprite_asteroid_urls[getRandomInt(2)];
@@ -166,17 +165,15 @@
                     y_asteroid = 500;
                     break;
             }
-            console.log(x_asteroid);
-            console.log(y_asteroid);
             spawnAsteroid(x_asteroid, y_asteroid);
         }
-        // console.log(asteroid_current_direction);
-        // console.log( asteroid_current_spawn_position);
         // Check if a collision occured
         collisionCheck()
         
+        // Adds to the score by time played
         score ++;
         
+        //Generate scoreboard
         ctx.fillStyle = "white";
         ctx.textAlign = "left";
         ctx.fillText("Score: " + score, 10, 380); 
