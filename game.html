@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8"/>
+	<title> AsteroidJS </title>
+	</head>
+<body>
+<style>
+    * {
+        color: white;
+    }
+    body{
+        background-color: black;
+    }
+    canvas{
+        background:url("assets/background.gif");
+    }
+</style>
+<header>
+    <h1>AsteroidJS</h1>
+</header>
+<section>
+    <canvas id="game-screen" width="800" height="400" style="border: white solid 1px;"> </canvas> 
+</section>
+<footer>
+    SONGS
+    <ul>
+        <li>"City Stomper" by DOS-88</li>
+        <li>"Game Over" by Open Art Library</li>
+    </ul>
+    ARTWORK
+    <ul>
+        <li>Spaceship by Vítor Ferreira Bem Silva</li>
+        <li>Asteroids by Vítor Ferreira Bem Silva</li>
+        <li>Star Parallax by Vítor Ferreira Bem Silva</li>
+        
+    </ul>
+    <small>All music and art used are available under non-comerical use</small>
+</footer>
+
+<script type="text/javascript">
+    // Initial canvas and context setup
+    var canvas = document.getElementById('game-screen'); 
+    var ctx = canvas.getContext('2d');
+    
+    // Initialize the soundtrack
+    var soundtrack = new sound("audio/ost.mp3");
+    // Initiliaze the game score
+    var score = 0;
+
+    // Initialize the player's default position
+    var x_player = 10;
+    var y_player = 150;
+
+    // Initialize the player's default dimensions
+    var height_player = 50;
+    var width_player = 50;
+    
+    // Initialize the player's default speed
+    var speed_player = 20;
+    
+    // Initialize the player's sprite
+    var sprite_player = new Image();
+    sprite_player.src = 'assets/sprite_right.png';
+    
+    // Initialize the asteroid's default position
+    var x_asteroid = 800;
+    var y_asteroid = 150;
+    
+    // Initialize the asteroid's default dimensions
+    var height_asteroid = 100;
+    var width_asteroid = 100;
+    
+    // Initialize the asteroid's default speed
+    var speed_asteroid = 5;
+    
+    // Initialize the asteroid's default sprite
+    var sprite_asteroid = new Image();
+    sprite_asteroid.src = 'assets/asteroid-1.png';
+    // This array contains the three different arts for the asteroid
+    sprite_asteroid_urls = ['assets/asteroid-1.png','assets/asteroid-2.png','assets/asteroid-3.png'];
+    
+    //starts the Game Loop
+    requestAnimationFrame(gameloop);
+    
+    function gameloop() {
+        // starts the soundtrack
+        soundtrack.play();
+
+        // receives the player input
+        window.onkeydown = movePlayer;
+        window.onkeyup = movePlayer;
+        
+        // Start of Out-of-Bounds Checks
+        // If any are true, player will teleport to the other edge of the map
+        if(x_player > 800){
+            x_player = 0;
+        } 
+
+        if(x_player < 0){
+            x_player = 800;
+        }
+
+        if(y_player < 0){
+            y_player = 400;
+        }
+
+        if(y_player > 400){
+            y_player = 0;
+        }
+        // End of Out-of-Bounds Checks
+        
+        // Write current player position
+        spawnPlayer(x_player,y_player);
+
+        if(x_asteroid > -100){
+            // Gradual increase in asteroid speed and game difficulty
+            speed_asteroid += 0.001;
+            x_asteroid = x_asteroid - speed_asteroid;
+            spawnAsteroid(x_asteroid, y_asteroid);
+        }
+        else{
+            // Creates an asteroid in a semi-random place with a semi-random art
+            sprite_asteroid.src = sprite_asteroid_urls[getRandomInt(2)];
+            y_asteroid = Math.floor(Math.random() * 400);
+            x_asteroid = 800;
+            spawnAsteroid(x_asteroid, y_asteroid);
+        }
+        
+        // Check if a collision occured
+        collisionCheck()
+        
+        score ++;
+        
+        ctx.fillStyle = "white";
+        ctx.textAlign = "left";
+        ctx.fillText("Score: " + score, 10, 380); 
+    }
+
+
+    function spawnPlayer(x,y) {
+        ctx.clearRect(0, 0, 800, 400);
+        ctx.drawImage(sprite_player, x, y, 50, 50);
+    }
+
+    function spawnAsteroid(x, y) {
+        ctx.drawImage(sprite_asteroid, x, y, width_asteroid, height_asteroid);
+    }
+
+    function movePlayer(keyPress){
+        if(keyPress.keyCode == 38  ) {
+            sprite_player.src='assets/sprite_up.png';
+            y_player = y_player - speed_player + 5;
+        }
+        if(keyPress.keyCode == 40  ) {
+            sprite_player.src='assets/sprite_down.png';
+            y_player = y_player + speed_player + 5;
+        }
+        if(keyPress.keyCode == 39  ) {
+            sprite_player.src='assets/sprite_right.png';
+            x_player = x_player + speed_player;
+        }
+        if(keyPress.keyCode == 37  ) {
+            sprite_player.src='assets/sprite_left.png';
+            x_player = x_player - speed_player;
+        }	
+    }
+
+    function collisionCheck()
+    {
+      if(((x_asteroid + width_asteroid) > x_player 
+        && x_asteroid < (x_player + width_player)) 
+        && ((y_asteroid + height_asteroid) > y_player 
+        && y_asteroid < (y_player + height_player))) 
+      {
+        gameOver();
+      } else {
+        requestAnimationFrame(gameloop);
+      }
+    }
+
+    function gameOver(){
+        soundtrack.stop();
+
+        soundtrack = new sound("audio/gameover.wav");
+        soundtrack.play();
+
+        ctx.fillStyle = "white";
+        ctx.textAlign = "left";
+        ctx.fillText("Game Over! Score: " + score, canvas.width/2, canvas.height/2); 
+        
+        clearTimeout();
+    }
+
+    // Code taken from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+
+    // Code taken from: https://www.w3schools.com/graphics/game_sound.asp
+    function sound(src) {
+        this.sound = document.createElement("audio");
+        this.sound.src = src;
+        this.sound.setAttribute("preload", "auto");
+        this.sound.setAttribute("controls", "none");
+        this.sound.style.display = "none";
+        
+        document.body.appendChild(this.sound);
+        
+        this.play = function(){
+            this.sound.play();
+        }
+        
+        this.stop = function(){
+            this.sound.pause();
+    }    
+}
+ </script>
+</body>
+</html>
