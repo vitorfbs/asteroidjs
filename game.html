@@ -64,9 +64,12 @@
     sprite_player.src = 'assets/sprite_right.png';
     
     // Initialize the asteroid's default position
+    var asteroid_current_spawn_position = 0;
+    var asteroid_positions = ['x','-x','y', '-y'];
+    var asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position];
     var x_asteroid = 800;
     var y_asteroid = 150;
-    
+    console.log(asteroid_current_direction);
     // Initialize the asteroid's default dimensions
     var height_asteroid = 100;
     var width_asteroid = 100;
@@ -112,21 +115,63 @@
         
         // Write current player position
         spawnPlayer(x_player,y_player);
-
-        if(x_asteroid > -100){
+        
+        if(x_asteroid > -100 && x_asteroid < 900 && y_asteroid > -100 && y_asteroid < 500){
             // Gradual increase in asteroid speed and game difficulty
             speed_asteroid += 0.001;
-            x_asteroid = x_asteroid - speed_asteroid;
+
+            switch (asteroid_current_direction) {
+                case "x":
+                    x_asteroid = x_asteroid - speed_asteroid;             
+                    break;
+                
+                case "-x":
+                    x_asteroid = x_asteroid + speed_asteroid;             
+                    break;
+            
+                case "y":
+                    y_asteroid = y_asteroid - speed_asteroid;             
+                    break;
+                    
+                case "-y":
+                    y_asteroid = y_asteroid + speed_asteroid;
+                    break;
+
+            }
             spawnAsteroid(x_asteroid, y_asteroid);
         }
         else{
             // Creates an asteroid in a semi-random place with a semi-random art
+            asteroid_current_spawn_position = getRandomInt(4);
+            asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position][1];
             sprite_asteroid.src = sprite_asteroid_urls[getRandomInt(2)];
-            y_asteroid = Math.floor(Math.random() * 400);
-            x_asteroid = 800;
+            switch (asteroid_current_direction) {
+                case "x":
+                    x_asteroid = 800;
+                    y_asteroid = getRandomInt(400);
+                    break;
+                
+                case "-x":
+                    x_asteroid = -50;
+                    y_asteroid = getRandomInt(400);
+                    break;
+
+                case "-y":
+                    x_asteroid = getRandomInt(800);
+                    y_asteroid = -50;
+                    break;
+
+                case "y":
+                    x_asteroid = getRandomInt(800);
+                    y_asteroid = 500;
+                    break;
+            }
+            console.log(x_asteroid);
+            console.log(y_asteroid);
             spawnAsteroid(x_asteroid, y_asteroid);
         }
-        
+        // console.log(asteroid_current_direction);
+        // console.log( asteroid_current_spawn_position);
         // Check if a collision occured
         collisionCheck()
         
