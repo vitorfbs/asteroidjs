@@ -142,7 +142,7 @@
         else{
             // Creates an asteroid in a semi-random place with a semi-random art with a semi-random direction
             asteroid_current_spawn_position = getRandomInt(4);
-            asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position][1];
+            asteroid_current_direction = asteroid_positions[asteroid_current_spawn_position];
             sprite_asteroid.src = sprite_asteroid_urls[getRandomInt(2)];
             switch (asteroid_current_direction) {
                 case "x":
